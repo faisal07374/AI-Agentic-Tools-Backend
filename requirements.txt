@@ -1,4 +1,6 @@
+fastapi
+uvicorn
 langchain
-langchain-openai
+langchain-mistralai
 langgraph
 python-dotenv
