@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.agent import app as agent_app  # Importing your agent
 import os
 from dotenv import load_dotenv
+import subprocess
+import json
 
 load_dotenv()
 
@@ -21,6 +23,10 @@ api.add_middleware(
 # Define what the request should look like
 class JSONRequest(BaseModel):
     text: str
+
+
+class SQLRequest(BaseModel):
+    question: str
 
 @api.post("/format-json")
 async def format_json_endpoint(request: JSONRequest):
@@ -41,6 +47,45 @@ async def format_json_endpoint(request: JSONRequest):
             "original": request.text,
             "formatted_json": result["json_output"]
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+def run_sql_agent(question: str):
+    """Run the Node.js SQL agent (index.js) and return parsed JSON result or error info."""
+    try:
+        result = subprocess.run(
+            ['node', 'index.js', question],
+            capture_output=True,
+            text=True,
+            cwd=os.path.dirname(__file__)
+        )
+
+        stdout = (result.stdout or "").strip()
+        stderr = (result.stderr or "").strip()
+
+        if stdout:
+            try:
+                return json.loads(stdout)
+            except Exception:
+                return {"error": "Failed to parse SQL agent stdout", "stdout": stdout}
+
+        if stderr:
+            try:
+                return json.loads(stderr)
+            except Exception:
+                return {"error": "SQL agent error", "stderr": stderr, "returncode": result.returncode}
+
+        return {"error": "No output from SQL agent", "returncode": result.returncode}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@api.post("/sql-query")
+async def sql_query_endpoint(request: SQLRequest):
+    try:
+        result = run_sql_agent(request.question)
+        return {"status": "success", "query": request.question, "result": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
