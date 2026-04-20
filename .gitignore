@@ -1,0 +1,37 @@
+# --- Environment Variables (CRITICAL) ---
+.env
+*.env
+env/
+venv/
+.venv/
+
+# --- Node.js / MERN ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+dist/
+build/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- Databases ---
+# We ignore the actual sqlite file so your production data 
+# doesn't get overwritten by local test data.
+db/*.sqlite
+db/*.db
+*.sqlite3
+
+# --- OS / IDE ---
+.DS_Store
+.vscode/
+.idea/
+Thumbs.db
+
+# --- Logs ---
+logs/
+*.log

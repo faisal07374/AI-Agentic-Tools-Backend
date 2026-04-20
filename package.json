@@ -1,0 +1,11 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@mistralai/mistralai": "^1.0.0",
+    "sqlite3": "^5.1.6",
+    "dotenv": "^16.0.0"
+  }
+}
